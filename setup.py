@@ -11,9 +11,9 @@ setup(name = 'target-parquet',
       py_modules = ['target_parquet'],
       install_requires=[
           'jsonschema==2.6.0',
-          'singer-python==2.1.4',
-          'pandas==0.24.2',
-          'pyarrow==0.13.0'
+          'singer-python==5.9.0',
+          'pandas==1.1.3',
+          'pyarrow==1.0.1'
       ],
       entry_points='''
           [console_scripts]
