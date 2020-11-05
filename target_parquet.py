@@ -72,6 +72,16 @@ def flatten(dictionary, parent_key='', sep='__'):
     return dict(items)
 
 
+def set_mixed_type_column_types(df):
+    for col in df.columns:
+        col_has_mixed_types = (df[[col]].applymap(type) != df[[col]].iloc[0].apply(type)).any(axis=1)
+        if len(df[col_has_mixed_types]) > 0:
+            df[col] = df[col].astype(str)
+
+        if df[col].dtype == list:
+            df[col] = df[col].astype(str)
+    return df
+
 def persist_messages(messages, destination_path, compression_method=None, streams_in_separate_folder=False):
     state = None
     schemas = {}
@@ -140,7 +150,7 @@ def persist_messages(messages, destination_path, compression_method=None, stream
         return state
     # Create a dataframe out of the record list and store it into a parquet file with the timestamp in the name.
     for stream_name in records.keys():
-        dataframe = pd.DataFrame(records[stream_name])
+        dataframe = set_mixed_type_column_types(pd.DataFrame(records[stream_name]))
         if streams_in_separate_folder and not os.path.exists(os.path.join(destination_path, stream_name)):
             os.makedirs(os.path.join(destination_path, stream_name))
         filename = stream_name + filename_separator + timestamp + compression_extension + '.parquet'
